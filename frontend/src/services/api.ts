@@ -1,6 +1,19 @@
 import { ForecastResponse, AccuracyResponse, MetadataResponse, IntervalRecord } from '../types/api';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+function getBaseUrl(): string {
+  let env = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.trim();
+  if (!env) {
+    // If running in browser and on a deployed domain, default to current origin + /api
+    if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      return `${window.location.origin}/api`;
+    }
+    return 'http://localhost:8000/api';
+  }
+  // Remove trailing slashes
+  return env.replace(/\/+$/, '');
+}
+
+const API_BASE_URL = getBaseUrl();
 
 export async function fetchForecast(
   date: string,

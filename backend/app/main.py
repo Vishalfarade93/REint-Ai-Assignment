@@ -21,15 +21,17 @@ app = FastAPI(
 # CORS middleware for local frontend development and containers
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# Support both /api/v1 prefix and direct root routes (e.g. /api/forecast and /forecast)
 app.include_router(router, prefix=settings.API_V1_STR)
+app.include_router(router)
 
-@app.get("/")
+@app.get("/", summary="Root API index")
 def root():
     return {
         "message": f"Welcome to {settings.PROJECT_NAME} API",
