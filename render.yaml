@@ -1,0 +1,33 @@
+services:
+  # ---------------------------------------------------------------------------
+  # REint AI - Backend REST API Service
+  # ---------------------------------------------------------------------------
+  - type: web
+    name: reint-ai-backend
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: ELEXON_BASE_URL
+        value: https://data.elexon.co.uk/bmrs/api/v1
+      - key: DEFAULT_CUTOFF_TIME
+        value: "10:00"
+      - key: CACHE_DIR
+        value: /tmp/data_cache
+      - key: PYTHON_VERSION
+        value: 3.12.7
+
+  # ---------------------------------------------------------------------------
+  # REint AI - Frontend React 19 SPA
+  # ---------------------------------------------------------------------------
+  - type: web
+    name: reint-ai-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
