@@ -1,0 +1,38 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: reint_ai_backend
+    ports:
+      - "8000:8000"
+    environment:
+      - ELEXON_BASE_URL=https://data.elexon.co.uk/bmrs/api/v1
+      - DEFAULT_CUTOFF_TIME=10:00
+      - CACHE_DIR=/app/data_cache
+    volumes:
+      - backend_cache:/app/data_cache
+    restart: unless-stopped
+    networks:
+      - reint_network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: reint_ai_frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - reint_network
+
+volumes:
+  backend_cache:
+    driver: local
+
+networks:
+  reint_network:
+    driver: bridge
